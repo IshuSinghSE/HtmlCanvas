@@ -11,10 +11,10 @@ window.addEventListener('load', function () {
 
 
     class Particle {
-        constructor(effect, x, y, color, lastX=0, lastY=0) {
+        constructor(effect, x, y, color) {
             this.effect = effect
-            this.x = lastX || Math.random() * this.effect.canvasWidth
-            this.y = lastY || 0
+            this.x =  Math.random() * this.effect.canvasWidth
+            this.y =  0
             this.color = color
             this.originX = x
             this.originY = y
