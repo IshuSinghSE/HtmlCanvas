@@ -1,0 +1,104 @@
+/* Resolution slider */
+#range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 75%;
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+    border-radius: 16px;
+
+}
+
+#range::-webkit-slider-runnable-track {
+    height: 7px;
+    background: #ccc;
+    border-radius: 16px;
+}
+
+#range::-moz-range-track {
+    height: 15px;
+    background: #ccc;
+    border-radius: 16px;
+}
+
+#range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    width: 15px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 2px solid #22a6f2;
+    box-shadow: -407px 0 0 400px #22a6f2;
+}
+
+#range::-moz-range-thumb {
+    height: 15px;
+    width: 15px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 1px solid #22a6f2;
+    box-shadow: -407px 0 0 400px #22a6f2;
+}
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70%;
+    cursor: pointer;
+    outline: none;
+    border-radius: 15px;
+    height: 7px;
+    background: #ccc;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    width: 15px;
+    background-color: #22a6f2;
+    border-radius: 50%;
+    border: none;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.3);
+    }
+}
+
+.slider::-moz-range-thumb {
+    height: 15px;
+    width: 15px;
+    background-color: #22a6f2;
+    border-radius: 50%;
+    border: none;
+    transition: .2s ease-in-out;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 10px rgba(0, 225, 255, 0.1)
+}
+
+.slider:active::-webkit-slider-thumb {
+    box-shadow: 0 0 0 13px rgba(0, 225, 255, 0.1)
+}
+
+.slider:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 13px rgba(0, 225, 255, 0.1)
+}
+
+.slider::-moz-range-thumb:hover {
+    box-shadow: 0 0 0 10px rgba(0, 225, 255, 0.1)
+}
+
+.slider:active::-moz-range-thumb {
+    box-shadow: 0 0 0 13px rgba(0, 225, 255, 0.1)
+}
+
+.slider:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 13px rgba(0, 225, 255, 0.1)
+}
+
+/* End resolution slider */
