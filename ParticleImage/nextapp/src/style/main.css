@@ -403,7 +403,7 @@ header .navbar .menu-icon:hover {
   display: flex;
   gap: 10px;
   justify-content: end;
-  align-items: inherit;
+  align-items: flex-end;
 }
 
 .main .canvas .drop-start {

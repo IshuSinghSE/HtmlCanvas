@@ -3,9 +3,11 @@ const ctx = canvas.getContext('2d', {
     willReadFrequently: true,
     // alpha: false,
 })
-canvas.width = 512
-canvas.height = 512
+canvas.width = 512 * 4
+canvas.height = 512 * 4
 
+
+//  Navbar Menu Toggle 
 const menu = document.getElementById('menu')
 const hamburger = document.getElementById('hamburger')
 const cross = document.getElementById('cross')
@@ -20,8 +22,36 @@ cross.addEventListener('click', () => {
     cross.style.display = 'none'
 })
 
+window.addEventListener('load', setMode)
 
-const label = document.getElementById('label')
+// Night Mode Toggle
+const body = document.querySelector('body'),
+    modeSwitch = body.querySelector('.night-mode-switch'),
+    modeIcon = body.querySelector('.night-mode-icon');
+
+modeSwitch.addEventListener('click', () => {
+    if (body.classList == 'theme-dark') {
+        body.classList.remove('theme-dark')
+        body.classList.add('theme-light')
+        body.style.backgroundColor = '#eeeeeece'
+        modeIcon.classList.toggle('bi-sun')
+        localStorage.setItem('mode', 'theme-light')
+
+    } else {
+        body.classList.remove('theme-light')
+        body.classList.add('theme-dark')
+        body.style.backgroundColor = '#111111ee'
+        modeIcon.classList.toggle('bi-sun')
+        localStorage.setItem('mode', 'theme-dark')
+
+    }
+    localStorage.setItem('mode', body.classList[0])
+
+})
+
+
+
+const sliderLabel = document.getElementById('label')
 const sliderInput = document.getElementById('slider-value')
 
 const slider = document.getElementById('slider')
@@ -33,8 +63,8 @@ imageFile.addEventListener('change', convert2Base64)
 const download = document.getElementById('download')
 download.addEventListener('click', downloadCanvasArt)
 
-const drop = document.getElementsByClassName('dropped')
-const drag = document.getElementsByClassName('dragged')
+const showEle = document.getElementsByClassName('dropped')
+const hideEle = document.getElementsByClassName('dragged')
 
 
 //  Drag & Drop functionality
@@ -45,17 +75,16 @@ dropRegion.addEventListener('dragenter', (e) => {
     e.stopPropagation();
     dropRegion.style.opacity = '1';
     dropRegion.classList.add('drop-start')
-    }, false);
+}, false);
 
 dropRegion.addEventListener('dragleave', (e) => {
     e.preventDefault();
     e.stopPropagation();
     dropRegion.classList.remove('drop-start')
-    }, false);
-    
+}, false);
+
 dropRegion.addEventListener('dragover', preventDefault, false);
 dropRegion.addEventListener('drop', handleDrop, false);
-
 
 // User Adjustable settings
 const background = document.getElementById('background')
@@ -74,8 +103,8 @@ fontStyle.addEventListener('change', handleAttribute)
 //Create Image for canvas
 const canvasImage = new Image();
 // canvasImage.src = 'edited.png'
-canvasImage.width = 512*1
-canvasImage.height = 512*1
+// canvasImage.width = canvas.width
+// canvasImage.height = canvas.height
 
 class Cell {
     constructor(x, y, symbol, color) {
@@ -86,13 +115,18 @@ class Cell {
 
     }
     draw(ctx, color = 'default', shadow = 'None') {
-        
+
+        //Change symbol fontstyle
         ctx.font = parseInt(slider.value) * 1 + 'px ' + fontStyle.value
 
+
+        //Change symbol shadow
         if (shadow !== 'default') {
             ctx.fillStyle = shadow
             ctx.fillText(this.symbol, this.x + 1, this.y + 1)
         }
+
+        //Change symbol Color
         if (color !== 'default') {
             ctx.fillStyle = color
             ctx.fillText(this.symbol, this.x, this.y)
@@ -101,7 +135,7 @@ class Cell {
             ctx.fillText(this.symbol, this.x, this.y)
         }
     }
-    
+
 }
 
 class AsciiEffect {
@@ -132,7 +166,7 @@ class AsciiEffect {
         else if (color > 60) return 'q'
         else if (color > 40) return ':'
         else if (color > 20) return '!'
-        // else if (color < 20) return 'O'
+        else if (color < 20) return '.'
         else return '';
     }
 
@@ -157,7 +191,6 @@ class AsciiEffect {
                 }
             }
         }
-        // console.log(this.#imageCellArray);
     }
 
     #drawAscii() {
@@ -165,19 +198,19 @@ class AsciiEffect {
         effect.changeBackground()
         for (let i = 0; i < this.#imageCellArray.length; i++) {
             this.#imageCellArray[i].draw(this.#ctx, symbolColor.value, symbolShadow.value)
-            // console.log(symbolColor.value)
         }
-        
+
     }
 
     draw(cellSize) {
         this.#scanImage(cellSize)
         this.#drawAscii()
-        
+
     }
 
-    changeBackground(){
-        if (background.value === 'white') {
+    // Change canvas Background Color
+    changeBackground() {
+        if (background.value === 'whiste') {
             canvas.classList.add('white')
             ctx.fillStyle = background.value
             ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -189,7 +222,7 @@ class AsciiEffect {
 
         } else {
             canvas.classList.remove('white')
-            canvas.style.backgroundColor = 'black'
+            canvas.style.backgroundColor = '#00000093'
             ctx.clearRect(0, 0, canvas.width, canvas.height)
         }
     }
@@ -201,24 +234,22 @@ canvasImage.onload = function initialize() {
     canvas.height = canvasImage.height
     // canvas.backgroundColor = 'white'
     effect = new AsciiEffect(ctx, canvasImage.width, canvasImage.height)
-    
     hideDragAndDropMenu()
     handleSlider()
-    
+
 }
 
 function handleSlider() {
     if (slider.value == 1) {
-        label.innerHTML = 'Original Image'
+        sliderLabel.innerHTML = 'Original Image'
         sliderInput.value = slider.value
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height)
     } else {
-        label.innerHTML = 'resolution'
+        sliderLabel.innerHTML = 'resolution'
         sliderInput.value = parseInt(slider.value)
-        // ctx.font = parseInt(slider.value) * 1 + 'px ' + fontStyle.value
         if (imageFile) { effect.draw(slider.value * 1) }
-        
+
     }
 }
 
@@ -228,16 +259,20 @@ function convert2Base64() {
         var reader = new FileReader();
         reader.onloadend = () => { canvasImage.src = reader.result }
         reader.readAsDataURL(file);
-        hideDragAndDropMenu()
+        // hideDragAndDropMenu()
     }
 }
 
 function hideDragAndDropMenu() {
-    for (let x = 0; x < drop.length; x++) {
-        drop[x].style.opacity = '0';
+    for (let x = 0; x < showEle.length; x++) {
+        if (showEle[x].id === 'drag-drop') {
+            showEle[x].style.opacity = '0'
+        } else {
+            showEle[x].style.display = 'none';
+        }
     }
-    for (let x = 0; x < drop.length; x++) {
-        drag[x].style.display = 'flex';
+    for (let x = 0; x < hideEle.length; x++) {
+        hideEle[x].style.display = 'flex';
     }
 
 }
@@ -250,8 +285,9 @@ function downloadCanvasArt() {
 }
 
 function handleAttribute() {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    if (imageFile) { effect.draw(slider.value * 1) }
+    if (imageFile && effect) { effect.draw(slider.value * 1) }
 }
 
 
@@ -269,8 +305,10 @@ function handleDrop(e) {
 
     var dt = e.dataTransfer, files = dt.files;
 
-    if (files.length) { handleFiles(files); 
-        } else{ var html = dt.getData('text/html'), match = html &&
+    if (files.length) {
+        handleFiles(files);
+    } else {
+        var html = dt.getData('text/html'), match = html &&
             /\bsrc="?([^"\s]+)"?\s*/.exec(html), url = match && match[1];
 
         if (url) { uploadImageFromURL(url); return; }
@@ -303,7 +341,7 @@ function handleDrop(e) {
 
 function validateImage(image) {
     // check the type
-    var validTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/gif'];
+    var validTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/gif', 'image/avif', 'image/heic'];
     if (validTypes.indexOf(image.type) === -1) {
         alert("Invalid File Type « only png, jpg, svg, gif supported », Try Again!");
         return false;
@@ -332,22 +370,78 @@ function handleFiles(files) {
 }
 
 
+function loadFont(name, src) {
+    const fontAlreadyLoaded = document.fonts.check(`10px ${name}`);
+
+    if (fontAlreadyLoaded) {
+        const fontFace = new FontFace(name, `url(${src})`);
+
+        try {
+            fontFace.load();
+            document.fonts.add(fontFace);
+            settingsMap[3]['propertyValue'].push(name)
+            // console.log('font loaded!')
+        } catch (e) {
+            console.error(`Font ${name} failed to load`);
+        }
+    }
+}
+
+function setMode() {
+    let savedMode = localStorage.getItem('mode')
+
+    if (savedMode !== null && body.classList[0] !== savedMode) {
+        body.classList.add(savedMode)
+        body.style.backgroundColor = '#eeeeeece'
+    } else {
+        localStorage.setItem('mode', 'theme-dark')
+    }
+
+    // window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
+    //     const theme = matches ? 'dark' : 'light';
+    //     console.log(`Change to ${theme} mode!`);
+    // });
+
+}
+
+
+
 const settingsMap = [
-    {'propertyName':symbolColor, 'propertyValue':['default', 'white', 'black', 'red', 'yellow', 'green', 'cyan', 'purple', 'pink', 'orange',]},
-    {'propertyName':symbolShadow, 'propertyValue' :['default', 'white','red', 'black']},
-    { 'propertyName': background, 'propertyValue': ['default', 'white', 'black', 'ghostwhite', 'aliceblue', 'lavender', 'DarkCyan', 'DarkBlue', 'DarkGreen' ]},
-    {'propertyName':fontStyle, 'propertyValue' :['monospace', 'Helvetica', 'veranda', 'cursive']},
+    { 'propertyName': symbolColor, 'propertyValue': ['default', 'white', 'black', 'red', 'yellow', 'green', 'cyan', 'purple', 'pink', 'orange',] },
+    { 'propertyName': symbolShadow, 'propertyValue': ['default', 'white', 'red', 'black'] },
+    { 'propertyName': background, 'propertyValue': ['default', 'white', 'black', 'ghostwhite', 'aliceblue', 'lavender', 'DarkCyan', 'DarkBlue', 'DarkGreen'] },
+    { 'propertyName': fontStyle, 'propertyValue': ['monospace', 'Helvetica', 'veranda', 'cursive'] },
 ]
 
+// type Font = { name: string; src: string };
+
+const customFonts = [['xcompany', './fonts/XCompany.ttf'],
+['creamy sugar', './fonts/CreamySugar-gxnGR.ttf'],
+['emotional', './fonts/EmotionalRescuePersonalUseRegular-PKY87.ttf'],
+['glorious', './fonts/GloriousChristmas-BLWWB.ttf'],
+['grandspace', './fonts/GrandSpaceFreeTrial-lgwmX.otf'],
+['superfunky', './fonts/SuperFunky-lgmWw.ttf'],
+['superpencil', './fonts/SuperPencil-ARGw7.ttf'],
+['superugged', './fonts/SuperRugged-4nBy9.ttf'],
+['texascrust', './fonts/TexasCrustPersonalUseReg-w1nrw.ttf'],
+['pumpkin', './fonts/PumpkinTypeHalloween.ttf'],]
+
+for (let font = 0; font < customFonts.length; font++) {
+    let name = customFonts[font][0]
+    let url = customFonts[font][1]
+    loadFont(name, url)
+}
+
 settingsMap.map((item) => {
-    if (item['propertyValue'].length){
+    if (item['propertyValue'].length) {
 
         item['propertyValue'].forEach(element => {
             let option = document.createElement('option')
-            option.value = element 
+            option.value = element
             option.textContent = element
-            
+
             item['propertyName'].appendChild(option)
+            if (item['propertyName'] === fontStyle) { option.style.fontFamily = element }
         });
     }
 });
