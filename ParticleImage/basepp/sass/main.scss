@@ -2,49 +2,36 @@
 @import 'abstracts/functions';
 @import 'abstracts/mixins';
 
-@import 'vendors/bootstrap';
-@import 'vendors/jquery-ui';
+@import 'themes/theme';
+// @import 'themes/admin';
 
-@import 'base/reset';
+// @import 'vendors/bootstrap';
+// @import 'vendors/jquery-ui';
+
+// @import 'base/reset';
 @import 'base/typography';
 
-@import 'layout/navigation';
-@import 'layout/grid';
 @import 'layout/header';
 @import 'layout/footer';
-@import 'layout/sidebar';
-@import 'layout/forms';
+// @import 'layout/grid';
+// @import 'layout/navigation';
+// @import 'layout/sidebar';
+// @import 'layout/forms';
 
-@import 'components/buttons';
-@import 'components/carousel';
 @import 'components/slider';
+@import 'components/blob';
+// @import 'components/buttons';
+// @import 'components/carousel';
 
-@import 'pages/home';
-@import 'pages/about';
-@import 'pages/contact';
-
-@import 'themes/theme';
-@import 'themes/admin';
-@import 'themes/media';
-
-
-$--clr-primary : #37b6ff;
-
-$--clr-secondary:#eeeeee;
-$--clr-secondary-light:#f8f8f8;
-$--clr-secondary-dark:#969696;
-$--clr-secondary-dark-2:#a1a1aa;
-
-$--clr-base:#1f1f1f;
-$--clr-base-light:#373737;
-$--clr-base-dark:#1c1c1c;
-
-$black:black;
-$white:white;
+// @import 'pages/home';
+// @import 'pages/about';
+// @import 'pages/contact';
 
 
-$radius : 10px;
-$radius-round:50%;
+
+
+
+/* ~~~~~~~ MAIN Content Starts Here ~~~~~~~ */
 
 
 *{
@@ -55,126 +42,50 @@ $radius-round:50%;
     // outline: 1px solid orchid;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body{
     width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: $--clr-base;
-    color: $--clr-secondary-dark-2;
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
     overflow-x: hidden;
-}
-
-header{
-    width: 100%;
-    height: 56px;
-    top: 0;
-    left: 0;
-    position: sticky;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding:12px 24px;
-    background-color: $black;
-    border-bottom: $--clr-base 1px solid;
-    z-index: 9999;
-
-    .logo{
-        z-index: 9999;
-        margin-left: 12px;
-        a{  
-            text-decoration: none;
-            font-family: "Style Script", cursive;
-            color: $white;
-            font-size: 2rem;
-            font-weight: 500;
-        }
-    }
-    .navbar{
-        ul{
-        list-style: none;
-        display: flex;
-        align-items: center;
-        gap: 24px;
-        transition: all 500ms ease-in-out;
-        z-index: 0;
-
-        li{ width: 100%;
-            
-            padding-inline: 12px;
-            a{
-                display: inline-block;
-                width: 100%;
-                padding: 6px 12px;
-                text-decoration: none;
-                color: $white; 
-                border-radius: $radius;
-                
-            }
-            &:hover{
-                opacity: 0.75;
-                
-            }
-        }
-        }
-
-        .menu-icon{
-            display: none;
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform: translate(-50%, 10%);
-            padding: 6px 8px;
-            font-size: 1.7rem;
-            color: $white;
-            border-radius: $radius;
-            &:hover{
-                background: $--clr-base-light;
-            }
-        }
-    }
-}
-
-/** Hamburger Menu **/
-.navbar{
-    .cross.open {
-        display: block;
-    }
-    .hamburger.open {
-        display: none;
-    }
-    ul.open {
-        transform: translateY(0%);
-        height: 100vh;
-
-    } 
+    background-color: #111111ee;
 }
 
 
 .main{
-    // margin-inline: -22px;
-    // width: 100%;
+    height: calc(100vh - 56px);
 
     .main-canvas-area{
         display: flex;
         flex-direction: column;
+        padding-bottom: 3rem;
     }
 
     
     .intro{
-        margin: 24px 12px 12px 24px;
+        padding: 24px 24px 12px 24px;
+        display: flex;
+        justify-content: center;
         user-select: none;
         .intro-text{ 
-            
             font-weight: 500;
+            @include themify($themes) {
+                    color: t('linkColor');
+                }
             .github{
                 user-select: text;
                 a{
-                color: $--clr-secondary;
                 text-decoration: underline;
+                @include themify($themes) {
+                        color: t('textColor');
+                    }
                 }
             }
         }
@@ -194,9 +105,12 @@ header{
             padding: 24px;
             width: 420px;
             height: 420px;
-            background-color: rgb(0, 0, 0);
             border-radius: 30px;
-            border: 3px #303030 solid;
+            @include themify($themes){
+                background-color: t('canvasBg');
+                border: 3px solid t('buttonBorder');
+                box-shadow: 1px 1px 1px 1px t('borderShadow');
+            }
         }
 
         .dropped{
@@ -204,7 +118,6 @@ header{
         }
         .drag-drop{
             position: absolute;
-            border: 2px dashed $--clr-secondary-dark;
             border-radius: 20px;
             flex-direction: column;
             align-items: center;
@@ -214,19 +127,24 @@ header{
             line-height: 1.5rem;
             // pointer-events: fill;
             transition: all 100ms ease;
+            @include themify($themes){
+                border: 2px dashed t('borderShadow');
+                color: t('textColor');
+            }
 
             .icon {
                     margin-right: 10px;
                 }
 
             .label {
-                    color: white;
                     font-weight: 500;
 
                 }
             
                 .file-label {
-                    background-color: #22a6f2;
+                    background-image: linear-gradient(45deg, $--clr-accent-1, $--clr-accent-2 );
+                    color: $--clr-primary;
+                    font-weight: 600;
                     width: 7rem;
                     height: 30px;
                     display: flex;
@@ -257,8 +175,12 @@ header{
             justify-content: space-evenly;
             margin-bottom: 24px;
             padding-bottom: 24px;
-            border-bottom: 1px $--clr-base-light solid;
             user-select: none;
+            font-weight: 600;
+            text-transform: capitalize;
+            @include themify($themes){
+                border-bottom: 1px t('borderShadow') solid;
+            }
 
             .icon{
                 margin-right: 10px;
@@ -267,19 +189,16 @@ header{
             .upload{
                     position: relative;
                     width: 50%;
-                .label {
-                        color: white;
-                    }
+
                 .file-label {
-                    background-color: #22a6f2;
                     width: 100%;
                     height: 44px;
-                    // display: flex;
                     align-items: center;
                     justify-content: center;
                     cursor: pointer;
                     border-radius: $radius;
                     transition: all 100ms ease-in;
+                    background-image: linear-gradient(45deg, $--clr-accent-1, $--clr-accent-2 );
                     
                         &:hover {
                             transform: scale(1.05);
@@ -292,11 +211,10 @@ header{
                 width: 50%;
 
                 a{
-                    background-color: #22a6f2;
-                    color: white;
+                    background-image: linear-gradient(45deg, $--clr-accent-1, $--clr-accent-2 );
+                    color: $--clr-primary;
                     width: 100%;
                     height: 44px;
-                    // display: flex;
                     text-decoration: none;
                     align-items: center;
                     justify-content: center;
@@ -318,7 +236,6 @@ header{
 
         .setting{
             // width: min(480px, 90%);
-            background-color: $--clr-base-dark;
             margin-block: 10px;
             padding: 10px 20px;
             border-radius: $radius;
@@ -326,9 +243,16 @@ header{
             align-items: center;
             justify-content: space-between;
             user-select: none;
+            backdrop-filter: blur(10rem);
+            @include themify($themes){
+                background-color: t('bgColor');
+                color: t('linkColor');
+                box-shadow: 0px 0px 1px 1px t('buttonShadowOut');
+            }
 
             .label{
                 text-transform: capitalize;
+                // font-weight: 600;
             }
 
             .unit{
@@ -348,20 +272,20 @@ header{
                 display: block;
                 padding: 2px;
                 position: relative;
-
-
             }
 
         .slider-value{
             appearance: textfield;
-            background-color: $--clr-base;
-            color: $--clr-secondary;
+            background-color: transparent;
             border-radius: $radius;
             outline: none;
-            border: 1px solid $--clr-base-light;
             width: 48px;
             height: 28px;
             padding-left: 10px;
+            @include themify($themes){
+                color: t('textColor');
+                border: 1px solid t('borderShadow');
+            }
 
             &:hover {
                 border: 1px solid $--clr-secondary-dark;
@@ -387,6 +311,38 @@ header{
                 justify-content: end;
                 align-items: inherit;
             }
+
+            select {
+                appearance: none;
+                outline: none;
+                padding-inline: 10px;
+                border-radius: $radius;
+                width: 100%;
+                height: 28px;
+                font-family: inherit;
+                cursor: inherit;
+                line-height: inherit;
+                text-transform: capitalize;
+                user-select: text;
+                @include themify($themes){
+                    background-color: transparent;
+                    border: 1px solid t('borderShadow');
+                    color: t('textColor');
+                }
+
+                &:hover {
+                    border: 1px solid $--clr-primary-light;
+                    cursor: pointer;
+                }
+
+                option {
+                    text-transform: capitalize;
+                    @include themify($themes){
+                        background-color: t('bgColor');
+                        color: t('textColor');
+                    }
+                }
+            }
         }
     }
 }
@@ -401,127 +357,102 @@ header{
     transition: all 500ms ease-in-out;
 }
 
-select{
-    appearance: none;
-    border: 1px solid $--clr-base-light;
-    outline: none;
-    padding-inline: 10px;
-    border-radius: $radius;
-    background: transparent;
-    color: $--clr-secondary;
-    width: 100%;
-    height: 28px;
-    background-color: transparent;
-    font-family: inherit;
-    cursor: inherit;
-    line-height: inherit;
-    text-transform: capitalize;
-    user-select: text;
 
-    &:hover {
-        border: 1px solid $--clr-secondary-dark;
-        cursor: pointer;
-    }
-
-    option{
-        background-color: $--clr-base-light;
-        color: $--clr-secondary;
-        text-transform: capitalize;
-    }
-}
-
-.main .main-canvas-area #canvas.white{
-    background-color: white;
+.main  #canvas.white{
+    background-color: #ffffff93;
     border: 1rem #0c0c0c solid;
     padding: 1rem;
 }
 
-/* ~~~~~~~~~~~~~~~~~~~ MEDIA QUERIES ~~~~~~~~~~~~~~~~~~~~ */
+.details {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 15rem 0px 0 16px ;
+    padding: 0 24px;
 
-/* Extra small devices (phones, 600px and down) */
-@media only screen and (max-width: 600px) {
-    header {
-
-        .navbar {
-            padding-inline: -1rem ;
-        }
-    }
-}
-
-/* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (max-width: 768px) {
-    header {
-        padding-inline: 1.5rem;
-
-        .navbar {
-            ul {
-                transform: translateY(calc(-100% - 56px));
-                width: 100%;
-                height: 100vh;
-                position: fixed;
-                gap: 0;
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: flex-start;
-                top: 56px;
-                left: 0;
-                padding: 32px 12px;
-                background: black;
-
-                li {
-                    font-weight: 600;
-                    font-size: 1.2rem;
-                }
-            }
-
-            .hamburger {
-                display: block;
-            }
-        }
+    @include themify($themes){
+        color: t('textColor');
     }
 
-    .main {
-        padding-inline: 1rem;
+    section{
+        width: 90%;
+        position: inherit; 
+        margin-block: 1rem;
         
-    }
-}
-
-/* Large devices (laptops/desktops, 992px and up) */
-@media only screen and (min-width: 992px) {
-    header {
-        padding: 2rem 5rem;
-        .logo{
-            a{
-                font-size: 2.5rem;
+        .heading{
+            font-size: 1.7rem;
+            background-size: 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -moz-text-fill-color: transparent;
+        
+            @include themify($themes) {
+                background-color: t('borderShadow');
             }
+        }
+        .content{
+            font-family: 'Poppins';
+            font-weight: 400;
+            text-align: justify;
+            font-size: 1rem;
+            padding: 4px;
+            line-height: 1.5rem;
+            word-spacing: 2px;
         }
     }
 
-    .main {
-        padding-inline: 5rem;
+    .about-us {
+        .heading {
+            background-image: linear-gradient(45deg, $--clr-accent-1, $--clr-accent-2 );
+        }
+    }
 
-        .intro{
-            padding-inline: 5rem ;
+    .journey {
+        .heading {
+            background-image: linear-gradient(45deg, $--clr-blob-1, $--clr-blob-2 );
+        }
+    }
+
+    .what-do-we-do {
+        .heading {
+            background-image: linear-gradient(45deg, $--clr-blob-2, $--clr-blob-3 );
+        }
+    }
+
+    .contact-us {
+        
+        .heading {
+            background-image: linear-gradient(45deg, $--clr-blob-3, $--clr-blob-1 );
         }
 
-        .main-canvas-area {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
+        .email-me{
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            text-decoration: none;
+            text-shadow: 1px 1px 1px $--clr-blob-1;
+            background-image: linear-gradient(45deg, $--clr-accent-1, $--clr-accent-2 );
+                background-size: 100%;
+                background-clip: text;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                -moz-text-fill-color: transparent;
 
-                .controls{
-                    padding-top: 3.5rem;
-                }
+            &:hover{
+                opacity: 0.7;
             }
+
+            .icon{
+                padding: 4px;
+                
+            }
+        }
     }
 }
 
-/* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1200px) {
-    header {
-        padding-inline: 10rem;
-    }
 
-    main {
-        padding-inline: 10rem;
-    }
-}
+@import 'themes/media'; 
