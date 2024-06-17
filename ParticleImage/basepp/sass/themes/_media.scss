@@ -50,11 +50,12 @@
     }
 
     .main {
-        padding-inline: 1rem;
+        // padding-inline: 1rem;
+        margin-top: 0;
 
         .intro {
             text-align: center;
-            padding-inline: 1.5rem;
+            // padding-inline: 1.5rem;
         }
     }
 
@@ -69,9 +70,14 @@
         transform: translate(-50vw, 100vh);
     }
 
+    .details{
+        padding-inline: 1.5rem;
+        padding-top: 4rem;
+    }
+
     footer{
         bottom: 0;
-        margin-top: 25rem ;
+        margin-top: 0rem ;
     }
 }
 
@@ -109,8 +115,8 @@
         margin-top: 0rem;
 
         section{
-            margin: 2rem 5rem;
-            width: 80%;
+            margin: 2rem 0rem;
+            width: 100%;
 
         }
     }

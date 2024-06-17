@@ -35,7 +35,7 @@
 /* ~~~~~~~ MAIN Content Starts Here ~~~~~~~ */
 
 
-*{
+*, *::after, *::before{
     margin: 0;
     padding: 0;
     box-sizing: border-box; 
@@ -48,10 +48,8 @@ html {
 }
 
 body{
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+    width: 100%;
+    height: 100%;
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
@@ -62,11 +60,14 @@ body{
 
 .main{
     height: calc(100vh - 56px);
+    width: auto;
+    margin-top: 1rem;
 
     .main-canvas-area{
         display: flex;
+        width: 100%;
         flex-direction: column;
-        padding-bottom: 3rem;
+        // padding-bottom: 3rem;
     }
 
     
@@ -166,9 +167,9 @@ body{
     }
 
     .controls{
+        width: auto;
         border-radius: $radius;
         padding-inline: 24px;
-        padding-bottom: 48px;
 
         .actions{
             width: 100%;
@@ -177,7 +178,7 @@ body{
             gap: 2.5rem;
             justify-content: space-evenly;
             margin-bottom: 24px;
-            padding-bottom: 24px;
+            // padding-bottom: 24px;
             user-select: none;
             font-weight: 600;
             text-transform: capitalize;
@@ -371,17 +372,18 @@ body{
     position: relative;
     width: 100%;
     height: 100%;
-    margin: 15rem 0px 0 16px ;
-    padding: 0 24px;
+    margin: 10rem 0px 0 0px ;
+    // padding: 0 24px;
 
     @include themify($themes){
         color: t('textColor');
     }
 
     section{
-        width: 90%;
+        width: auto;
         position: inherit; 
         margin-block: 1rem;
+
         
         .heading{
             font-size: 1.7rem;
