@@ -3,10 +3,33 @@
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     header {
-
-        .navbar {
-            padding-inline: -1rem;
+        min-width: 400px;
+        // .navbar {
+        //     padding-inline: -1rem;
+        // }
+    }
+    .main{
+        .main-canvas-area > *{
+            max-width: 512px;
+            min-height: auto;
         }
+        .canvas{
+            padding-inline: 20px ;
+
+            #canvas{
+                min-width: 380px;
+                min-height: 380px;
+            }
+        }
+    }
+
+        .details {
+            padding-inline: 1.5rem;
+            padding-top: 0rem;
+            margin-top: 3rem;
+        }
+    footer{
+        min-width: 400px;
     }
 }
 
@@ -50,11 +73,12 @@
     }
 
     .main {
-        padding-inline: 1rem;
+        // padding-inline: 1rem;
+        margin-top: 0;
 
         .intro {
             text-align: center;
-            padding-inline: 1.5rem;
+            // padding-inline: 1.5rem;
         }
     }
 
@@ -69,8 +93,15 @@
         transform: translate(-50vw, 100vh);
     }
 
+    .details{
+        padding-inline: 1.5rem;
+        padding-top: 4rem;
+        margin-top: 3rem;
+    }
+
     footer{
-        margin-top: 10rem ;
+        bottom: 0;
+        margin-top: 0rem ;
     }
 }
 
@@ -106,10 +137,10 @@
 
     .details{
         margin-top: 0rem;
-
+        padding: 0rem 5rem;
         section{
-            margin: 2rem 5rem;
-            width: 80%;
+            margin-top: 2rem ;
+            width: 100%;
 
         }
     }
@@ -122,6 +153,10 @@
     }
 
     main {
+        padding-inline: 10rem;
+    }
+
+    .details{
         padding-inline: 10rem;
     }
 }

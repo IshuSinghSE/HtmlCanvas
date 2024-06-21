@@ -3,20 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="Pixeture">
+    <meta name="keywords" content="ASCII, ascii, pixel, art, symbol">
+    <meta name="author" content="IshuSinghSE">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Pixeture</title>
     <link rel="icon" type="image/x-icon" href="favicon.png">
-    <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="stylesheet" href="sass/main.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
-<body class="theme-dark">
+<body class="theme-dark" id="intro">
 
 
-    <header>
+    <header class="bg-orange-300">
         <div class="logo">
-            <a href="#">Pixeture</a>
+            <a href="#intro">Pixeture</a>
         </div>
 
         <nav class="navbar">
@@ -41,8 +44,10 @@
     <div class="backdrop-art-group">
         <div class="backdrop-art"></div>
         <div class="backdrop-art"></div>
-        <div class="backdrop-art"></div>
+        <!-- <div class="backdrop-art"></div> -->
     </div>
+
+    
 
     <div class="main">
 
@@ -57,6 +62,14 @@
         <div class="main-canvas-area">
             <div class="canvas">
                 <canvas id="canvas"></canvas>
+                <div class="loader-wrapper">
+                    <div class="loader">
+                        <div class="inner one"></div>
+                        <div class="inner two"></div>
+                        <div class="inner three"></div>
+                    </div>
+                </div>
+                
                 <div class="drag-drop dropped" id="drag-drop">
                     <h4 class="dropped">Drag & Drop</h4>
                     <p class="separation-or dropped">or</p>
@@ -78,17 +91,17 @@
                         <input type="file" class="file-upload" id="upload" accept="image/*" hidden>
                     </div>
                     <div class="download dragged">
-                        <a href="#" type="button" class="dragged" id="download" download> <i
+                        <a href="#download" type="button" class="dragged" id="download" download> <i
                                 class="bi bi-download icon"></i>download</a>
                     </div>
                 </div>
 
                 <!-- settings -->
                 <div class="resolution setting">
-                    <label for="Resolution" class="label" id="label">resolution
+                    <label for="slider" class="label" id="label">resolution
                         <!-- <span class="unit">(PX)</span> --></label>
                     <div class="slider-box">
-                        <input type="range" class="slider" id="slider" id="range" value="7" min="1" max="20">
+                        <input type="range" class="slider" id="slider" id="range" id="resolution" value="7" min="1" max="20">
                         <input type="number" class="slider-value" id="slider-value" value="7">
                     </div>
                 </div>
@@ -99,6 +112,13 @@
                         <i class="bi bi-chevron-down dropdown-icon"></i>
                     </div>
                 </div>
+                <!-- <div class="background-gradient setting">
+                    <label for="background-gradient" class="label" id="label">BG gradient</label>
+                    <div class="custom-select">
+                        <select name="background-gradient" id="background-gradient" class="background"></select>
+                        <i class="bi bi-chevron-down dropdown-icon"></i>
+                    </div>
+                </div> -->
                 <div class="symbol-shadow setting">
                     <label for="symbol-shadow" class="label" id="label">symbol shadow</label>
                     <div class="custom-select">
@@ -174,9 +194,7 @@
         </div>
     </footer>
 
-
-
-    <script src="script.js" defer></script>
+    <script  src="script.js" defer></script>
 
 </body>
 

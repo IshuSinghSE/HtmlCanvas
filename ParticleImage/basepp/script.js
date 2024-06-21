@@ -22,7 +22,8 @@ cross.addEventListener('click', () => {
     cross.style.display = 'none'
 })
 
-window.addEventListener('load', setMode)
+const loader = document.querySelector('.loader')
+
 
 // Night Mode Toggle
 const body = document.querySelector('body'),
@@ -49,10 +50,12 @@ modeSwitch.addEventListener('click', () => {
 
 })
 
+window.addEventListener('load', setMode)
 
 
 const sliderLabel = document.getElementById('label')
 const sliderInput = document.getElementById('slider-value')
+sliderInput.addEventListener('change', handleSliderValue)
 
 const slider = document.getElementById('slider')
 slider.addEventListener('change', handleSlider)
@@ -90,6 +93,9 @@ dropRegion.addEventListener('drop', handleDrop, false);
 const background = document.getElementById('background')
 background.addEventListener('change', handleAttribute)
 
+// const backgroundGradient = document.getElementById('background-gradient')
+// background.addEventListener('change', handleAttribute)
+
 const symbolShadow = document.getElementById('symbol-shadow')
 symbolShadow.addEventListener('change', handleAttribute)
 
@@ -102,9 +108,132 @@ fontStyle.addEventListener('change', handleAttribute)
 
 //Create Image for canvas
 const canvasImage = new Image();
-// canvasImage.src = 'edited.png'
+canvasImage.src = 'edited.png'
 // canvasImage.width = canvas.width
 // canvasImage.height = canvas.height
+
+
+const settingsMap = [
+    { 'propertyName': symbolColor, 'propertyValue': ['default', 'white', 'black', 'red', 'yellow', 'green', 'cyan', 'purple', 'pink', 'orange',] },
+    { 'propertyName': symbolShadow, 'propertyValue': ['default', 'white', 'red', 'black', 'yellow', 'gold'] },
+    { 'propertyName': background, 'propertyValue': ['default', 'white', 'black', 'lavender', 'DarkCyan', 'red', 'yellow', 'pink', 'aqua'], 'gradientColors': [] },
+    { 'propertyName': fontStyle, 'propertyValue': ['monospace', 'Helvetica', 'veranda', 'cursive'] },
+]
+
+const gradients = [
+    {
+        "name": "Omolon",
+        "colors": ["#091E3A", "#2F80ED", "#2D9EE0"]
+    },
+    {
+        "name": "Farhan",
+        "colors": ["#9400D3", "#4B0082"]
+    },
+    {
+        "name": "Purple",
+        "colors": ["#c84e89", "#F15F79"]
+    },
+    {
+        "name": "Ibtesam",
+        "colors": ["#00F5A0", "#00D9F5"]
+    },
+    {
+        "name": "Radioactive Heat",
+        "colors": ["#F7941E", "#72C6EF", "#00A651"]
+    },
+    {
+        "name": "The Sky And The Sea",
+        "colors": ["#F7941E", "#004E8F"]
+    },
+    {
+        "name": "From Ice To Fire",
+        "colors": ["#72C6EF", "#004E8F"]
+    },
+    {
+        "name": "Blue & Orange",
+        "colors": ["#FD8112", "#0085CA"]
+    },
+    {
+        "name": "Purple Dream",
+        "colors": ["#bf5ae0", "#a811da"]
+    },
+    {
+        "name": "Blu",
+        "colors": ["#00416A", "#E4E5E6"]
+    },
+    {
+        "name": "Summer Breeze",
+        "colors": ["#fbed96", "#abecd6"]
+    },
+]
+
+
+// type Font = { name: string; src: string };
+
+const customFonts = [
+    ['xcompany', './fonts/XCompany.ttf'],
+    ['creamy sugar', './fonts/CreamySugar-gxnGR.ttf'],
+    ['emotional', './fonts/EmotionalRescuePersonalUseRegular-PKY87.ttf'],
+    ['glorious', './fonts/GloriousChristmas-BLWWB.ttf'],
+    ['grandspace', './fonts/GrandSpaceFreeTrial-lgwmX.otf'],
+    ['superfunky', './fonts/SuperFunky-lgmWw.ttf'],
+    ['superpencil', './fonts/SuperPencil-ARGw7.ttf'],
+    ['superugged', './fonts/SuperRugged-4nBy9.ttf'],
+    ['texascrust', './fonts/TexasCrustPersonalUseReg-w1nrw.ttf'],
+    ['pumpkin', './fonts/PumpkinTypeHalloween.ttf'],
+]
+
+loadFont()
+
+settingsMap.map((item) => {
+
+    if (item['propertyValue'].length) {
+
+        item['propertyValue'].forEach(() => {
+            if (item['propertyName'] === background) { item['gradientColors'].push([]) }
+        })
+
+        if (item['propertyName'] === background) {
+            gradients.map((opt) => {
+                item['propertyValue'].push(opt.name)
+                item['gradientColors'].push(opt.colors)
+            })
+            // console.log(item['propertyValue'],item['gradientColors']);
+        }
+
+        item['propertyValue'].forEach((element, index) => {
+            let option = document.createElement('option')
+            option.value = element
+            option.textContent = element
+
+            item['propertyName'].appendChild(option)
+
+            if (item['propertyName'] === fontStyle) { option.style.fontFamily = element }
+            if (item['propertyName'] === symbolColor) { option.style.color = element }
+            // if (item['propertyName'] === symbolShadow) { option.style.padding = '20px' }
+
+            if (item['propertyName'] === background) {
+
+                if (item['gradientColors'][index].length) {
+                    // console.log(item['gradientColors'][index], element);
+
+                    option.style.backgroundImage = 'linear-gradient(to right, lightblue, darkblue)';
+
+                } else { option.style.backgroundColor = element }
+
+            }
+        });
+
+        //     if (item['propertyName'] === background){
+        //     item['gradientColors'].forEach(clr=>{
+
+        //         console.log(item['propertyValue'][0] ,clr);
+        //     })
+        // }
+    }
+});
+
+
 
 class Cell {
     constructor(x, y, symbol, color) {
@@ -114,6 +243,7 @@ class Cell {
         this.color = color
 
     }
+
     draw(ctx, color = 'default', shadow = 'None') {
 
         //Change symbol fontstyle
@@ -210,23 +340,29 @@ class AsciiEffect {
 
     // Change canvas Background Color
     changeBackground() {
-        if (background.value === 'whiste') {
-            canvas.classList.add('white')
-            ctx.fillStyle = background.value
+        if (background.value !== 'default') {
+            console.log(background.value)
+            // canvas.style.backgroundImage = 'linear-gradient(to bottom right, lightblue, darkblue)';
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, "lightblue");
+            grad.addColorStop(1, "darkblue");
+            ctx.fillStyle = grad
             ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        } else if (background.value !== 'default') {
-            canvas.style.backgroundColor = background.value
-            ctx.fillStyle = background.value
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        } else {
+        }
+        // if (background.value !== 'default') {
+        //     canvas.style.backgroundColor = background.value
+        //     ctx.fillStyle = background.value
+        //     ctx.fillRect(0, 0, canvas.width, canvas.height)
+        // }
+        else {
             canvas.classList.remove('white')
             canvas.style.backgroundColor = '#00000093'
             ctx.clearRect(0, 0, canvas.width, canvas.height)
         }
     }
 }
+
+
 
 let effect;
 canvasImage.onload = function initialize() {
@@ -239,42 +375,59 @@ canvasImage.onload = function initialize() {
 
 }
 
-function handleSlider() {
-    if (slider.value == 1) {
-        sliderLabel.innerHTML = 'Original Image'
-        sliderInput.value = slider.value
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height)
-    } else {
-        sliderLabel.innerHTML = 'resolution'
-        sliderInput.value = parseInt(slider.value)
-        if (imageFile) { effect.draw(slider.value * 1) }
 
+function handleSlider() {
+    if (sliderInput.value !== slider.value) { sliderInput.value = slider.value }
+
+    if (imageFile.files.length > 0 || canvasImage.src ) {
+        showLoader(true)
+        if (slider.value == 1) {
+            sliderLabel.innerHTML = 'Original Image'
+            sliderInput.value = parseInt(slider.value)
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height)
+            showLoader(false)
+        } else {
+            sliderLabel.innerHTML = 'resolution'
+            sliderInput.value = parseInt(slider.value)
+            if (imageFile.files.length || canvasImage.src) { effect.draw(slider.value * 1) }
+            showLoader(false)
+        }
+        hideDragAndDropMenu(true)
     }
 }
 
+function handleSliderValue() {
+    slider.value = sliderInput.value
+    handleSlider()
+}
+
 function convert2Base64() {
+    hideDragAndDropMenu()
+    showLoader(true)
     if (imageFile.files.length > 0) {
         var file = imageFile.files[0];
         var reader = new FileReader();
         reader.onloadend = () => { canvasImage.src = reader.result }
         reader.readAsDataURL(file);
-        // hideDragAndDropMenu()
     }
 }
 
-function hideDragAndDropMenu() {
-    for (let x = 0; x < showEle.length; x++) {
-        if (showEle[x].id === 'drag-drop') {
-            showEle[x].style.opacity = '0'
-        } else {
-            showEle[x].style.display = 'none';
+function hideDragAndDropMenu(showOptions = false) {
+    if (!showOptions) {
+        for (let x = 0; x < showEle.length; x++) {
+            if (showEle[x].id === 'drag-drop') {
+                showEle[x].style.opacity = '0'
+            } else {
+                showEle[x].style.display = 'none';
+            }
         }
     }
-    for (let x = 0; x < hideEle.length; x++) {
-        hideEle[x].style.display = 'flex';
+    if (showOptions) {
+        for (let x = 0; x < hideEle.length; x++) {
+            hideEle[x].style.display = 'flex';
+        }
     }
-
 }
 
 function downloadCanvasArt() {
@@ -287,7 +440,7 @@ function downloadCanvasArt() {
 function handleAttribute() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    if (imageFile && effect) { effect.draw(slider.value * 1) }
+    if (imageFile.files.length && effect) { effect.draw(slider.value * 1) }
 }
 
 
@@ -303,10 +456,12 @@ function handleDrop(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    var dt = e.dataTransfer, files = dt.files;
-
-    if (files.length) {
-        handleFiles(files);
+    var dt = e.dataTransfer;
+    imageFile.files = dt.files;
+    hideDragAndDropMenu()
+    showLoader(true)
+    if (imageFile.files.length) {
+        handleFiles(imageFile.files);
     } else {
         var html = dt.getData('text/html'), match = html &&
             /\bsrc="?([^"\s]+)"?\s*/.exec(html), url = match && match[1];
@@ -358,7 +513,7 @@ function previewAnduploadImage(image) {
     var reader = new FileReader();
     reader.onloadend = () => { canvasImage.src = reader.result }
     reader.readAsDataURL(image);
-    hideDragAndDropMenu()
+    // hideDragAndDropMenu()
 
 }
 
@@ -370,19 +525,27 @@ function handleFiles(files) {
 }
 
 
-function loadFont(name, src) {
-    const fontAlreadyLoaded = document.fonts.check(`10px ${name}`);
+function loadFont() {
+    let name, src;
 
-    if (fontAlreadyLoaded) {
-        const fontFace = new FontFace(name, `url(${src})`);
+    for (let font = 0; font < customFonts.length; font++) {
+        name = customFonts[font][0]
+        src = customFonts[font][1]
+        // loadFont(name, url)
 
-        try {
-            fontFace.load();
-            document.fonts.add(fontFace);
-            settingsMap[3]['propertyValue'].push(name)
-            // console.log('font loaded!')
-        } catch (e) {
-            console.error(`Font ${name} failed to load`);
+        const fontAlreadyLoaded = document.fonts.check(`10px ${name}`);
+
+        if (fontAlreadyLoaded) {
+            const fontFace = new FontFace(name, `url(${src})`);
+
+            try {
+                fontFace.load();
+                document.fonts.add(fontFace);
+                settingsMap[3]['propertyValue'].push(name)
+                // console.log('font loaded!')
+            } catch (e) {
+                console.error(`Font ${name} failed to load`);
+            }
         }
     }
 }
@@ -397,6 +560,7 @@ function setMode() {
         localStorage.setItem('mode', 'theme-dark')
     }
 
+
     // window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
     //     const theme = matches ? 'dark' : 'light';
     //     console.log(`Change to ${theme} mode!`);
@@ -404,44 +568,29 @@ function setMode() {
 
 }
 
-
-
-const settingsMap = [
-    { 'propertyName': symbolColor, 'propertyValue': ['default', 'white', 'black', 'red', 'yellow', 'green', 'cyan', 'purple', 'pink', 'orange',] },
-    { 'propertyName': symbolShadow, 'propertyValue': ['default', 'white', 'red', 'black'] },
-    { 'propertyName': background, 'propertyValue': ['default', 'white', 'black', 'ghostwhite', 'aliceblue', 'lavender', 'DarkCyan', 'DarkBlue', 'DarkGreen'] },
-    { 'propertyName': fontStyle, 'propertyValue': ['monospace', 'Helvetica', 'veranda', 'cursive'] },
-]
-
-// type Font = { name: string; src: string };
-
-const customFonts = [['xcompany', './fonts/XCompany.ttf'],
-['creamy sugar', './fonts/CreamySugar-gxnGR.ttf'],
-['emotional', './fonts/EmotionalRescuePersonalUseRegular-PKY87.ttf'],
-['glorious', './fonts/GloriousChristmas-BLWWB.ttf'],
-['grandspace', './fonts/GrandSpaceFreeTrial-lgwmX.otf'],
-['superfunky', './fonts/SuperFunky-lgmWw.ttf'],
-['superpencil', './fonts/SuperPencil-ARGw7.ttf'],
-['superugged', './fonts/SuperRugged-4nBy9.ttf'],
-['texascrust', './fonts/TexasCrustPersonalUseReg-w1nrw.ttf'],
-['pumpkin', './fonts/PumpkinTypeHalloween.ttf'],]
-
-for (let font = 0; font < customFonts.length; font++) {
-    let name = customFonts[font][0]
-    let url = customFonts[font][1]
-    loadFont(name, url)
+function showLoader(status) {
+    if (status) {
+        loader.style.display = 'block';
+        loader.style.opacity = '1';
+    } else {
+        loader.style.display = 'none';
+    }
 }
 
-settingsMap.map((item) => {
-    if (item['propertyValue'].length) {
 
-        item['propertyValue'].forEach(element => {
-            let option = document.createElement('option')
-            option.value = element
-            option.textContent = element
 
-            item['propertyName'].appendChild(option)
-            if (item['propertyName'] === fontStyle) { option.style.fontFamily = element }
-        });
-    }
-});
+let x = 0;
+let y = 0;
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = 'white'
+    ctx.fillRect(x, y, 150, 150)
+    x++
+    y++
+    window.requestAnimationFrame(animate)
+    // animate()
+}
+
+
+// animate()
