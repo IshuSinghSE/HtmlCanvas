@@ -33,11 +33,21 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+        
+      # Deploy first directory
+      - name: Upload artifact for first directory
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: './ParticleImage/basepp'
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy first directory to GitHub Pages
+        id: deployment1
+        uses: actions/deploy-pages@v4
+
+      # Deploy second directory
+      - name: Upload artifact for second directory
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './ParticleText'
+      - name: Deploy second directory to GitHub Pages
+        id: deployment2
         uses: actions/deploy-pages@v4
