@@ -34,7 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
         
-            # Deploy first directory
+      # Deploy first directory
       - name: Upload artifact for first directory
         uses: actions/upload-pages-artifact@v3
         with:
@@ -45,6 +45,8 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: 'artifact-first-directory'
+      - name: Set first directory URL
+        run: echo "page_url=${{ steps.deployment1.outputs.page_url }}" >> $GITHUB_ENV
 
       # Deploy second directory
       - name: Upload artifact for second directory
@@ -57,3 +59,10 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: 'artifact-second-directory'
+      - name: Set second directory URL
+        run: echo "page_url=${{ steps.deployment2.outputs.page_url }}" >> $GITHUB_ENV
+
+      - name: Display URLs
+        run: |
+          echo "First directory URL: ${{ env.page_url }}"
+          echo "Second directory URL: ${{ env.page_url }}"
