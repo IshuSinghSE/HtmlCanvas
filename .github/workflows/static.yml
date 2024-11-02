@@ -33,41 +33,34 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        
-      # Deploy first directory
-      - name: Upload artifact for first directory
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './ParticleImage/basepp'
-          name: 'artifact-first-directory'
-      - name: Deploy first directory to GitHub Pages
-        id: deployment1
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: 'artifact-first-directory'
-          target_path: 'ParticleImage/basepp'
-      - name: Set first directory URL
-        run: echo "first_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleImage/basepp" >> $GITHUB_ENV
 
-      # Deploy second directory
-      - name: Upload artifact for second directory
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './ParticleText'
-          name: 'artifact-second-directory'
-      - name: Deploy second directory to GitHub Pages
-        id: deployment2
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: 'artifact-second-directory'
-          target_path: 'ParticleText'
-      - name: Set second directory URL
-        run: echo "second_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleText" >> $GITHUB_ENV
-
-      - name: Display URLs
+      # Move first directory content to the correct subdirectory
+      - name: Prepare first directory
         run: |
-          echo "First directory URL: ${{ env.first_page_url }}"
-          echo "Second directory URL: ${{ env.second_page_url }}"
+          mkdir -p ./public/ParticleImage/basepp
+          mv ./ParticleImage/basepp/* ./public/ParticleImage/basepp/
+
+      # Move second directory content to the correct subdirectory
+      - name: Prepare second directory
+        run: |
+          mkdir -p ./public/ParticleText
+          mv ./ParticleText/* ./public/ParticleText/
+
+      # Deploy content
+      - name: Upload artifact for deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './public'
+          name: 'artifact-deployment'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: 'artifact-deployment'
+      - name: Set URLs
+        run: |
+          echo "first_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleImage/basepp" >> $GITHUB_ENV
+          echo "second_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleText" >> $GITHUB_ENV
 
       - name: Display URLs
         run: |
