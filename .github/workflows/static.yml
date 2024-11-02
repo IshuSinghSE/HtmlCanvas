@@ -34,7 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
         
-      # Deploy first directory
+            # Deploy first directory
       - name: Upload artifact for first directory
         uses: actions/upload-pages-artifact@v3
         with:
@@ -43,6 +43,8 @@ jobs:
       - name: Deploy first directory to GitHub Pages
         id: deployment1
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: 'artifact-first-directory'
 
       # Deploy second directory
       - name: Upload artifact for second directory
@@ -51,10 +53,7 @@ jobs:
           path: './ParticleText'
           name: 'artifact-second-directory'
       - name: Deploy second directory to GitHub Pages
-        id: deployment3
-        uses: actions/deploy-pages@v4
-        with:
-          path: './ParticleText'
-      - name: Deploy second directory to GitHub Pages
         id: deployment2
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: 'artifact-second-directory'
