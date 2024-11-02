@@ -45,8 +45,9 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: 'artifact-first-directory'
+          target_path: 'ParticleImage/basepp'
       - name: Set first directory URL
-        run: echo "first_page_url=${{ steps.deployment1.outputs.page_url }}" >> $GITHUB_ENV
+        run: echo "first_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleImage/basepp" >> $GITHUB_ENV
 
       # Deploy second directory
       - name: Upload artifact for second directory
@@ -59,8 +60,14 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: 'artifact-second-directory'
+          target_path: 'ParticleText'
       - name: Set second directory URL
-        run: echo "second_page_url=${{ steps.deployment2.outputs.page_url }}" >> $GITHUB_ENV
+        run: echo "second_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleText" >> $GITHUB_ENV
+
+      - name: Display URLs
+        run: |
+          echo "First directory URL: ${{ env.first_page_url }}"
+          echo "Second directory URL: ${{ env.second_page_url }}"
 
       - name: Display URLs
         run: |
