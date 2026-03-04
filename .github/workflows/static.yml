@@ -46,6 +46,12 @@ jobs:
           mkdir -p ./public/ParticleText
           mv ./ParticleText/* ./public/ParticleText/
 
+      # Move third directory content to the correct subdirectory
+      - name: Prepare third directory
+        run: |
+          mkdir -p ./public/neurosync
+          mv ./neurosync/* ./public/neurosync/
+
       # Deploy content
       - name: Upload artifact for deployment
         uses: actions/upload-pages-artifact@v3
@@ -61,8 +67,10 @@ jobs:
         run: |
           echo "first_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleImage/basepp" >> $GITHUB_ENV
           echo "second_page_url=https://ishusinghse.github.io/HtmlCanvas/ParticleText" >> $GITHUB_ENV
+          echo "third_page_url=https://ishusinghse.github.io/HtmlCanvas/neurosync" >> $GITHUB_ENV
 
       - name: Display URLs
         run: |
           echo "First directory URL: ${{ env.first_page_url }}"
           echo "Second directory URL: ${{ env.second_page_url }}"
+          echo "Third directory URL: ${{ env.third_page_url }}"
