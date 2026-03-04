@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Precision Trainer + AI Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+        canvas { display: block; cursor: crosshair; }
+        .glass { background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); }
+        #ui-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            transition: opacity 0.3s ease;
+        }
+        .ai-glow {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+        /* Custom scrollbar for AI text */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="ui-overlay">
+        <div id="menu-content" class="glass p-8 border border-zinc-800 rounded-3xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden">
+            <h1 id="main-title" class="text-4xl font-black mb-2 text-white italic">NEURO-SYNC</h1>
+            <p class="text-zinc-500 mb-8 text-sm">Fine-tuning motor cortex coordination for non-dominant hands.</p>
+            
+            <div id="initial-setup">
+                <div class="mb-8">
+                    <label class="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-3 block">Select Training Hand</label>
+                    <div class="flex gap-4">
+                        <button id="btn-left" onclick="app.setHand('Left')" class="flex-1 py-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold transition-all">LEFT HAND</button>
+                        <button id="btn-right" onclick="app.setHand('Right')" class="flex-1 py-4 rounded-xl border-2 border-zinc-800 bg-zinc-900 text-zinc-400 font-bold transition-all">RIGHT HAND</button>
+                    </div>
+                </div>
+
+                <button onclick="app.start()" class="w-full bg-white hover:bg-zinc-200 text-black font-black py-4 rounded-xl transition-all active:scale-95 shadow-lg shadow-white/5">
+                    START TRAINING SESSION
+                </button>
+            </div>
+
+            <div id="results-content" class="hidden">
+                <!-- Results injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="fixed top-6 left-0 w-full px-10 flex justify-between items-start pointer-events-none opacity-0 transition-opacity duration-500">
+        <div class="flex gap-10">
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Precision</p>
+                <p id="precision-hud" class="text-2xl font-mono font-bold">0.0px</p>
+            </div>
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Accuracy</p>
+                <p id="accuracy-hud" class="text-2xl font-mono font-bold">100%</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <p id="hand-label" class="text-[10px] uppercase tracking-[0.2em] text-emerald-500 font-bold">LEFT HAND MODE</p>
+            <p id="timer-hud" class="text-4xl font-mono font-black italic">0.00s</p>
+            <p id="progress-hud" class="text-xs text-zinc-500 mt-1">0 / 25 TARGETS</p>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const apiKey = "";
+        const THEMES = [
+            { name: 'Emerald', primary: '#10b981', glow: 'rgba(16, 185, 129, 0.5)' },
+            { name: 'Rose', primary: '#f43f5e', glow: 'rgba(244, 63, 94, 0.5)' },
+            { name: 'Sky', primary: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.5)' },
+            { name: 'Amber', primary: '#f59e0b', glow: 'rgba(245, 158, 11, 0.5)' },
+            { name: 'Violet', primary: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.5)' }
+        ];
+
+        class PrecisionApp {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.overlay = document.getElementById('ui-overlay');
+                this.initialSetup = document.getElementById('initial-setup');
+                this.resultsContent = document.getElementById('results-content');
+                this.hud = document.getElementById('hud');
+                
+                this.targetsTotal = 25;
+                this.activeLimit = 4;
+                this.targets = [];
+                this.hits = [];
+                this.misses = 0;
+                this.hand = 'Left';
+                this.theme = THEMES[0];
+                
+                this.state = 'MENU'; 
+                this.startTime = 0;
+
+                window.addEventListener('resize', () => this.resize());
+                this.canvas.addEventListener('mousedown', (e) => this.handleInput(e));
+                this.resize();
+                this.render();
+            }
+
+            setHand(h) {
+                this.hand = h;
+                document.getElementById('btn-left').className = h === 'Left' ? 
+                    'flex-1 py-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold' : 
+                    'flex-1 py-4 rounded-xl border-2 border-zinc-800 bg-zinc-900 text-zinc-400 font-bold';
+                document.getElementById('btn-right').className = h === 'Right' ? 
+                    'flex-1 py-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold' : 
+                    'flex-1 py-4 rounded-xl border-2 border-zinc-800 bg-zinc-900 text-zinc-400 font-bold';
+                document.getElementById('hand-label').innerText = `${h.toUpperCase()} HAND MODE`;
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            start() {
+                this.theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+                document.getElementById('hand-label').style.color = this.theme.primary;
+                
+                this.state = 'PLAYING';
+                this.overlay.style.opacity = '0';
+                setTimeout(() => { 
+                    this.overlay.style.display = 'none'; 
+                    this.hud.style.opacity = '1'; 
+                    this.initialSetup.classList.add('hidden');
+                    this.resultsContent.classList.add('hidden');
+                }, 300);
+                
+                this.hits = [];
+                this.targets = [];
+                this.misses = 0;
+                this.startTime = performance.now();
+                
+                for(let i=0; i < this.activeLimit; i++) this.spawnTarget();
+            }
+
+            spawnTarget() {
+                if (this.hits.length + this.targets.length >= this.targetsTotal) return;
+
+                const padding = 120;
+                const size = Math.random() * 15 + 5; // Even smaller for high precision
+                const x = Math.random() * (this.canvas.width - padding * 2) + padding;
+                const y = Math.random() * (this.canvas.height - padding * 2) + padding;
+                
+                this.targets.push({ x, y, r: size, spawnTime: performance.now() });
+            }
+
+            handleInput(e) {
+                if (this.state !== 'PLAYING') return;
+
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                let hitIndex = -1;
+                let minDist = Infinity;
+
+                this.targets.forEach((t, index) => {
+                    const dist = Math.hypot(mouseX - t.x, mouseY - t.y);
+                    if (dist < t.r && dist < minDist) {
+                        minDist = dist;
+                        hitIndex = index;
+                    }
+                });
+
+                if (hitIndex !== -1) {
+                    const hit = this.targets.splice(hitIndex, 1)[0];
+                    this.hits.push({
+                        offset: minDist,
+                        reaction: performance.now() - hit.spawnTime
+                    });
+                    this.spawnTarget();
+                    if (this.hits.length >= this.targetsTotal) this.finish();
+                } else {
+                    this.misses++;
+                }
+                this.updateHUD();
+            }
+
+            updateHUD() {
+                const totalClicks = this.hits.length + this.misses;
+                const accuracy = totalClicks === 0 ? 100 : (this.hits.length / totalClicks) * 100;
+                const avgPrecision = this.hits.length === 0 ? 0 : 
+                    this.hits.reduce((a, b) => a + b.offset, 0) / this.hits.length;
+
+                document.getElementById('accuracy-hud').innerText = `${accuracy.toFixed(0)}%`;
+                document.getElementById('precision-hud').innerText = `${avgPrecision.toFixed(1)}px`;
+                document.getElementById('progress-hud').innerText = `${this.hits.length} / ${this.targetsTotal} TARGETS`;
+            }
+
+            async callGemini(prompt) {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { 
+                        parts: [{ text: "You are a specialized Neuro-Motor Coach. You help users train their non-dominant hand. Your tone is scientific, encouraging, and concise. Always provide a 'Neurological Insight' and one 'Actionable Drill'." }] 
+                    }
+                };
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await response.json();
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Neural link interrupted.";
+                    } catch (e) {
+                        await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                    }
+                }
+                return "Failed to establish AI connection after multiple attempts.";
+            }
+
+            async getAIInsight() {
+                const btn = document.getElementById('ai-btn');
+                const box = document.getElementById('ai-response-box');
+                const content = document.getElementById('ai-text-content');
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="animate-pulse">✨ ANALYZING NEURAL DATA...</span>';
+                box.classList.remove('hidden');
+                content.innerText = "Processing motor metrics...";
+
+                const stats = this.getStats();
+                const prompt = `Analyze this session for the ${this.hand} hand. 
+                Stats: ${stats.totalTime}s total time, ${stats.accuracy}% accuracy, ${stats.avgPrec}px precision offset, ${stats.avgReaction}ms average reaction. 
+                User Context: Right-handed person training their left hand. 
+                Focus on: Stability vs Speed trade-offs.`;
+
+                const result = await this.callGemini(prompt);
+                content.innerText = result;
+                btn.innerHTML = '✨ NEURAL ANALYSIS COMPLETE';
+            }
+
+            getStats() {
+                const totalTime = (performance.now() - this.startTime) / 1000;
+                const avgReaction = (this.hits.reduce((a, b) => a + b.reaction, 0) / this.hits.length).toFixed(0);
+                const avgPrec = (this.hits.reduce((a, b) => a + b.offset, 0) / this.hits.length).toFixed(1);
+                const accuracy = ((this.hits.length / (this.hits.length + this.misses)) * 100).toFixed(1);
+                return { totalTime: totalTime.toFixed(2), avgReaction, avgPrec, accuracy };
+            }
+
+            finish() {
+                this.state = 'RESULTS';
+                const stats = this.getStats();
+
+                this.overlay.style.display = 'flex';
+                this.overlay.style.opacity = '1';
+                this.hud.style.opacity = '0';
+                this.resultsContent.classList.remove('hidden');
+
+                this.resultsContent.innerHTML = `
+                    <div class="text-center">
+                        <span class="text-[10px] font-bold tracking-[0.3em] text-zinc-500 uppercase">${this.hand} Hand Results</span>
+                        <h1 class="text-4xl font-black mb-6" style="color: ${this.theme.primary}">Session Report</h1>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div class="bg-black/40 p-3 rounded-2xl border border-zinc-800">
+                                <p class="text-[9px] text-zinc-500 uppercase tracking-widest mb-1">Accuracy</p>
+                                <p class="text-xl font-mono font-bold text-white">${stats.accuracy}%</p>
+                            </div>
+                            <div class="bg-black/40 p-3 rounded-2xl border border-zinc-800">
+                                <p class="text-[9px] text-zinc-500 uppercase tracking-widest mb-1">Precision</p>
+                                <p class="text-xl font-mono font-bold text-white">${stats.avgPrec}px</p>
+                            </div>
+                        </div>
+
+                        <div id="ai-response-box" class="hidden mb-6 p-4 rounded-2xl bg-violet-500/5 ai-glow text-left">
+                            <p class="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-2 flex items-center">
+                                <span class="mr-2">✨</span> Neural Coach Insight
+                            </p>
+                            <div id="ai-text-content" class="text-xs text-zinc-300 leading-relaxed max-h-40 overflow-y-auto custom-scroll pr-2 whitespace-pre-wrap">
+                                Loading analysis...
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button id="ai-btn" onclick="app.getAIInsight()" class="w-full py-4 rounded-xl font-black bg-violet-600 text-white transition-all hover:bg-violet-500 shadow-lg shadow-violet-900/20 active:scale-95">
+                                ✨ GET AI NEURAL ANALYSIS
+                            </button>
+                            <button onclick="location.reload()" class="w-full py-3 rounded-xl font-bold border border-zinc-800 text-zinc-400 hover:bg-zinc-800 transition-all">
+                                TRAIN AGAIN
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            render() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                if (this.state === 'PLAYING') {
+                    const elapsed = (performance.now() - this.startTime) / 1000;
+                    document.getElementById('timer-hud').innerText = `${elapsed.toFixed(2)}s`;
+
+                    this.targets.forEach(t => {
+                        this.ctx.shadowBlur = 15;
+                        this.ctx.shadowColor = this.theme.glow;
+                        this.ctx.beginPath();
+                        this.ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+                        this.ctx.fillStyle = this.theme.primary;
+                        this.ctx.fill();
+                        
+                        this.ctx.shadowBlur = 0;
+                        this.ctx.beginPath();
+                        this.ctx.arc(t.x, t.y, 1, 0, Math.PI * 2);
+                        this.ctx.fillStyle = '#000';
+                        this.ctx.fill();
+
+                        const pulse = Math.sin(performance.now() / 150) * 3;
+                        this.ctx.beginPath();
+                        this.ctx.arc(t.x, t.y, t.r + 5 + pulse, 0, Math.PI * 2);
+                        this.ctx.strokeStyle = this.theme.primary;
+                        this.ctx.lineWidth = 1;
+                        this.ctx.globalAlpha = 0.15;
+                        this.ctx.stroke();
+                        this.ctx.globalAlpha = 1.0;
+                    });
+                }
+                requestAnimationFrame(() => this.render());
+            }
+        }
+
+        const app = new PrecisionApp();
+    </script>
+</body>
+</html>
